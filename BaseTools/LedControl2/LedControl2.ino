@@ -1,7 +1,7 @@
 
 #include <OctoWS2811.h>
 
-#define ledsPerStrip 200
+#define ledsPerStrip 250
 #define numStrips 6
 #define numLeds ledsPerStrip*numStrips
 

@@ -7,7 +7,7 @@
 //
 //////////////////////////////////////////////////
 
-#define NUM_LEDS 50
+#define NUM_LEDS 30
 
 CRGB leds[NUM_LEDS];
 
@@ -19,10 +19,6 @@ void setup() {
    	// setting brightness to 25% brightness
    	LEDS.setBrightness(64);
    	 LEDS.addLeds<WS2811, 2>(leds, NUM_LEDS);
-    LEDS.addLeds<WS2811, 3>(leds, NUM_LEDS);
-     LEDS.addLeds<WS2811, 4>(leds, NUM_LEDS);
-      LEDS.addLeds<WS2811, 5>(leds, NUM_LEDS);
-       LEDS.addLeds<WS2811, 6>(leds, NUM_LEDS);
    pinMode(13,OUTPUT);
 }
 

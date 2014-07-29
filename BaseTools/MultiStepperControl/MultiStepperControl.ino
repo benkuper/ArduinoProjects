@@ -6,14 +6,16 @@ ByteBuffer send_buffer;
 #include <AccelStepper.h>
 
 // Define a stepper and the pins it will use
-#define NUM_STEPPERS 3
+#define NUM_STEPPERS 5
 
 AccelStepper stepper1(2, 2, 3); // Nb pins, step, dir
 AccelStepper stepper2(2, 4, 5);
 AccelStepper stepper3(2, 6, 7);
-AccelStepper steppers[3] = {stepper1,stepper2,stepper3};
+AccelStepper stepper4(2, 8, 10);
+AccelStepper stepper5(2, 11, 12);
+AccelStepper steppers[5] = {stepper1,stepper2,stepper3,stepper4,stepper5};
 
-bool stepperSpeedModes[3] = {false,false,false};
+bool stepperSpeedModes[5] = {false,false,false,false,false};
 
 byte buffer[32];
 int bufferIndex = -1;
@@ -30,7 +32,7 @@ void setup()
   
   for(int i=0;i<NUM_STEPPERS;i++)
   {
-    setMotorMaxSpeed(i,800);
+    setMotorMaxSpeed(i,1000);
     setMotorAcceleration(i,1000);
     homeMotor(i);
   }
@@ -58,6 +60,10 @@ void handlePacket(ByteBuffer* packet)
     case 'h':
       homeMotor(stepperIndex);
       break;
+      
+   case 'd':
+     defineMotorPosition(stepperIndex,packet->getLong());
+     break;
 
     case 's':
       setMotorSpeed(stepperIndex,packet->getFloat());
@@ -93,6 +99,12 @@ void homeMotor(int sid)
   setMotorPosition(sid,0);
 }
 
+void defineMotorPosition(int sid, long value)
+{
+  steppers[sid].setCurrentPosition(value);
+  setMotorPosition(sid,value);
+}
+
 void setMotorSpeed(int sid, float value)
 {
   stepperSpeedModes[sid] = true;
@@ -106,7 +118,7 @@ void setMotorPosition(int sid, long value)
   steppers[sid].moveTo(value);
   sendLong('d',steppers[sid].targetPosition());
 }
-
+  
 void setMotorAcceleration(int sid, float value)
 {
   steppers[sid].setAcceleration(value);
