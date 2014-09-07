@@ -4,7 +4,7 @@ int bufferIndex = -1;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pinMode(13,HIGH);
+  pinMode(13,OUTPUT);
 }
 
 void loop() {
@@ -21,8 +21,14 @@ void processSerial()
     digitalWrite(13,LOW);
     
     byte b = Serial.read();
-    if(b == 255) processBuffer();
-    else if(bufferIndex < 31) buffer[bufferIndex++] = b;
+    if(b == 255) 
+    {
+      processBuffer();
+      bufferIndex = 0;
+    }else if(bufferIndex < 31)
+    {
+      buffer[bufferIndex] = b;
+      bufferIndex++;
   }
 }
 
@@ -43,6 +49,5 @@ void processBuffer()
      break;
   }
   
-  bufferIndex = 0;
   digitalWrite(13,LOW);
 }
