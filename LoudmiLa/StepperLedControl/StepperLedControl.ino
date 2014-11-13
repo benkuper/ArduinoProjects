@@ -6,16 +6,13 @@ ByteBuffer send_buffer;
 #include <AccelStepper.h>
 
 // Define a stepper and the pins it will use
-#define NUM_STEPPERS 5
+#define NUM_STEPPERS 2
 
 AccelStepper stepper1(2, 2, 3); // Nb pins, step, dir
 AccelStepper stepper2(2, 4, 5);
-AccelStepper stepper3(2, 6, 7);
-AccelStepper stepper4(2, 8, 10);
-AccelStepper stepper5(2, 11, 12);
-AccelStepper steppers[5] = {stepper1,stepper2,stepper3,stepper4,stepper5};
+AccelStepper steppers[NUM_STEPPERS] = {stepper1,stepper2};
 
-bool stepperSpeedModes[5] = {false,false,false,false,false};
+bool stepperSpeedModes[NUM_STEPPERS] = {false,false};
 
 byte buffer[32];
 int bufferIndex = -1;
@@ -33,7 +30,7 @@ void setup()
   for(int i=0;i<NUM_STEPPERS;i++)
   {
     setMotorMaxSpeed(i,1000);
-    setMotorAcceleration(i,1000);
+    setMotorAcceleration(i,500);
     homeMotor(i);
   }
   
@@ -53,18 +50,18 @@ void handlePacket(ByteBuffer* packet)
   // Here we could do anything we want to the data but for now we will just send it back
   byte command = packet->get();
   long stepperIndex = packet->getLong();
+  
+  if(stepperIndex >= NUM_STEPPERS) return;
+  
   sendValue('m',stepperIndex);
+  
   
   switch (command)
   {
     case 'h':
       homeMotor(stepperIndex);
       break;
-   
-   case 'z':
-      stopMotor(stepperIndex);
-      break;
-   
+      
    case 'd':
      defineMotorPosition(stepperIndex,packet->getLong());
      break;
@@ -99,24 +96,21 @@ void processMotors()
 
 void homeMotor(int sid)
 {
+  if(sid >= NUM_STEPPERS) return;
   steppers[sid].setCurrentPosition(0);
   setMotorPosition(sid,0);
 }
 
-void stopMotor(int sid)
-{
-  long pos = steppers[sid].currentPosition();
-  setMotorPosition(sid,pos);
-}
-
 void defineMotorPosition(int sid, long value)
 {
+  if(sid >= NUM_STEPPERS) return;
   steppers[sid].setCurrentPosition(value);
   setMotorPosition(sid,value);
 }
 
 void setMotorSpeed(int sid, float value)
 {
+  if(sid >= NUM_STEPPERS) return;
   stepperSpeedModes[sid] = true;
   steppers[sid].setSpeed(value);
   sendValue('s',steppers[sid].speed());
@@ -124,6 +118,7 @@ void setMotorSpeed(int sid, float value)
 
 void setMotorPosition(int sid, long value)
 {
+  if(sid >= NUM_STEPPERS) return;
   stepperSpeedModes[sid] = false;
   steppers[sid].moveTo(value);
   sendLong('d',steppers[sid].targetPosition());
@@ -131,11 +126,13 @@ void setMotorPosition(int sid, long value)
   
 void setMotorAcceleration(int sid, float value)
 {
+  if(sid >= NUM_STEPPERS) return;
   steppers[sid].setAcceleration(value);
 }
 
 void setMotorMaxSpeed(int sid, float value)
 {
+  if(sid >= NUM_STEPPERS) return;
   steppers[sid].setMaxSpeed(value);
 }
 

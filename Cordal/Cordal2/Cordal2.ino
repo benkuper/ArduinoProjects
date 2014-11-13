@@ -2,7 +2,7 @@
 #include <OctoWS2811.h>
 
 #define ledsPerStrip 300
-#define numLeds 8
+#define numLeds ledsPerStrip*8
 
 DMAMEM int displayMemory[ledsPerStrip*6];
 int drawingMemory[ledsPerStrip*6];
@@ -58,6 +58,9 @@ void processBuffer()
   leds.show();
   ledBufferIndex = 0;
   digitalWrite(13,LOW);
+  
+  //Serial.println(ledBufferIndex);
+  
   /*
   //Serial.print("processBuffer : ");
   //Serial.println(numLeds);
@@ -76,8 +79,8 @@ void processBuffer()
   }
   leds.show();
   digitalWrite(13,LOW);
-  //Serial.print("byte index : ");
-  //Serial.println(ledBufferIndex);
+  Serial.print("byte index : ");
+  
   ledBufferIndex = 0;
   memset(ledBuffer,0,maxBuffer);
   */

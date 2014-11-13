@@ -1,20 +1,21 @@
 
 #include <OctoWS2811.h>
 
-#define ledsPerStrip 300
-#define numLeds 8
+#define ledsPerStrip 9
+#define numStrips 6
+#define numLeds ledsPerStrip*numStrips
 
-DMAMEM int displayMemory[ledsPerStrip*6];
-int drawingMemory[ledsPerStrip*6];
+DMAMEM int displayMemory[numLeds];
+int drawingMemory[numLeds];
 const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
-//const int maxBuffer = numLeds *3;
-//byte ledBuffer[maxBuffer];
-
+const int maxBuffer = numLeds *3;
+byte ledBuffer[maxBuffer];
 int ledBufferIndex = 0;
+
 uint8_t colorBuffer[3];
-int colorBufferIndex = 0;
+
 
 void setup()
 {
@@ -36,32 +37,17 @@ void processSerial()
       byte b = Serial.read();
       if(b == 255) processBuffer();
       //if(b == 'c') processBuffer();
-      else if(ledBufferIndex < numLeds) 
+      else if(ledBufferIndex < maxBuffer) 
       {
-        colorBuffer[colorBufferIndex] = (uint8_t)b;
-        colorBufferIndex++;
-        if(colorBufferIndex == 3)
-        {
-          //int targetLed = ledBufferIndex;
-          //if(targetLed >= ledsPerStrip && targetLed < ledsPerStrip*2) targetLed += ledsPerStrip*4;
-          leds.setPixel(ledBufferIndex,colorBuffer[0],colorBuffer[1],colorBuffer[2]);
-          colorBufferIndex = 0;
-          ledBufferIndex++;
-        }
+        ledBuffer[ledBufferIndex] = b;
+        ledBufferIndex++;
       }
     }
 }
 
 void processBuffer()
 {
-  digitalWrite(13,HIGH);
-  leds.show();
-  ledBufferIndex = 0;
-  digitalWrite(13,LOW);
-  /*
-  //Serial.print("processBuffer : ");
-  //Serial.println(numLeds);
-  //Serial.println(maxBuffer);
+
   digitalWrite(13,HIGH);
   
   for(uint8_t i=0;i<numLeds;i++)
@@ -80,6 +66,6 @@ void processBuffer()
   //Serial.println(ledBufferIndex);
   ledBufferIndex = 0;
   memset(ledBuffer,0,maxBuffer);
-  */
+  
   
 }
